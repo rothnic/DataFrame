@@ -65,6 +65,13 @@ classdef DataFrame < dynamicprops
             
             out = self.data;
         end
+        
+        function details(self)
+            
+            builtin('disp', self);
+            self.head();
+            self.summary();
+        end
     end
     
     methods (Access = private)
@@ -110,8 +117,8 @@ classdef DataFrame < dynamicprops
             out = width(self.data);
         end
         
-        function out = summary(self)
-            out = summary(self.data);
+        function summary(self)
+            summary(self.data);
         end
         
         function out = toStruct(self)
@@ -167,7 +174,7 @@ classdef DataFrame < dynamicprops
             switch call_type
                 case '.'
                     if ismethod(self, var)
-                        if strcmp(var, 'head')
+                        if strcmp(var, 'head') || strcmp(var, 'details')
                             builtin('subsref', self, S);
                         else
                             out = builtin('subsref', self, S);
