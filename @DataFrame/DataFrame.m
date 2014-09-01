@@ -28,6 +28,7 @@ classdef DataFrame < dynamicprops
     
     %% Properties
     properties
+        Properties
     end
     
     properties (Access = private)
@@ -83,23 +84,19 @@ classdef DataFrame < dynamicprops
     % Constructors
     methods (Static)
         function out = fromStruct(varargin)
-            out = struct2table(varargin{:});
-            out = DataFrame(out);
+            out = DataFrame(struct2table(varargin{:}));
         end
         
         function out = fromCSV(varargin)
-            out = readtable(varargin{:});
-            out = DataFrame(out);
+            out = DataFrame(readtable(varargin{:}));
         end
         
         function out = fromArray(varargin)
-            out = array2table(varargin{:});
-            out = DataFrame(out);
+            out = DataFrame(array2table(varargin{:}));
         end
         
         function out = fromCell(varargin)
-            out = cell2table(varargin{:});
-            out = DataFrame(out);
+            out = DataFrame(cell2table(varargin{:}));
         end
     end
     
@@ -133,6 +130,9 @@ classdef DataFrame < dynamicprops
             writetable(self.data, varargin{:})
         end
         
+        function out = get.Properties(self)
+            out = self.data.Properties;
+        end
     end
     
     %% Static
@@ -156,17 +156,6 @@ classdef DataFrame < dynamicprops
     
     %% Overrides
     methods
-        function num = numel(self)
-            %NUMEL - overrides the builtin method for length. Length of
-            %table fails, so this returns the height of the table
-            
-            if isempty(self.data)
-                num = 0;
-            else
-                % DataFrame length equal to length of column 1
-                num = height(self.data);
-            end
-        end
         
         function out = subsref(self, S)
             %SUBSREF - overrides the subscript reference method, which
@@ -178,10 +167,14 @@ classdef DataFrame < dynamicprops
             switch call_type
                 case '.'
                     if ismethod(self, var)
-                        builtin('subsref', self, S);
+                        if strcmp(var, 'head')
+                            builtin('subsref', self, S);
+                        else
+                            out = builtin('subsref', self, S);
+                        end
                     else
                         tbl = self.data;
-                        out = subsref(tbl, S);
+                        out = builtin('subsref', tbl, S);
                     end
                 case '()'
                     
