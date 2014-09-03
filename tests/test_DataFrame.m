@@ -18,7 +18,7 @@ end
 function test_DataFrame_TableAccess(testCase)
 %Test that we can access the table properties
 
-testCase.TestData.df.Properties;
+testCase.TestData.df.Properties.VariableNames;
 end
 
 function test_dyn_props(testCase)
@@ -56,10 +56,15 @@ end
 
 function check_props(df)
 
-props = df.Properties;
-vars = props.VariableNames;
-for i = 1:length(vars)
-    df.(vars{i});
+props = df.Properties.VariableNames;
+%vars = props.VariableNames;
+
+for i = 1:length(props)
+    df.(props{i});      % "." reference
+    df(:, i);          % "()" reference
+    df(1, props{i});
+    df{:, i};          % "{}" reference
+    df{:, props{i}};
 end
 end
 

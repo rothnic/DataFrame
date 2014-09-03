@@ -164,28 +164,40 @@ classdef DataFrame < dynamicprops
     %% Overrides
     methods
         
-        function out = subsref(self, S)
+        function [varargout] = subsref(self, S)
             %SUBSREF - overrides the subscript reference method, which
             %provides the way for us to wrap the built in table type
+            
+            varargout{1} = [];
             
             call_type = S.type;
             var = S.subs;
             
+            %Catch the subscript behavior so that we can pass through table
+            %calls directly to it, and methods/class properties to the
+            %DataFrame class
             switch call_type
                 case '.'
                     if ismethod(self, var)
                         if strcmp(var, 'head') || strcmp(var, 'details')
+                            
+                            % method calls without outputs
                             builtin('subsref', self, S);
                         else
-                            out = builtin('subsref', self, S);
+                            varargout{1} = builtin('subsref', self, S);
                         end
                     else
-                        tbl = self.data;
-                        out = builtin('subsref', tbl, S);
+                        %Pass through properties call
+                        varargout{1} = builtin('subsref', self, S);
                     end
                 case '()'
-                    
+                    % Process the '()' subscripting directly on table
+                    tbl = self.data;
+                    varargout{1} = builtin('subsref', tbl, S);
                 case '{}'
+                    % Process the '{}' subscripting directly on table
+                     tbl = self.data;
+                     varargout{1} = builtin('subsref', tbl, S);
             end
         end
         
@@ -194,6 +206,15 @@ classdef DataFrame < dynamicprops
             %DataFrame look like a typical table
             
             disp(self.data);
+        end
+        
+        function out = numel(~, varargin)
+            %NUMEL - override the default numel method. It is critical that
+            %both the first arguement and second arguement, "varargin"
+            %exists, since this directly affects when Matlab will call the
+            %method. Otherwise, '{}' subscripting breaks.
+            
+            out = 1;
         end
     end
 
