@@ -39,6 +39,21 @@ function test_height(testCase)
 height(testCase.TestData.df);
 end
 
+function test_subsasgn_simple(testCase)
+df2 = testCase.TestData.df;
+df2.test2 = 1;
+end
+
+function test_subsasgn_csv(testCase)
+df2 = testCase.TestData.csv_df;
+df2.Lng = ones(length(df2.Lng), 1);
+assert(length(df2.Lng) > 2);
+df2(:, 'Lng') = df2(:, 'Lat');
+assert(length(df2.Lng) > 2);
+df2{:, 'Lng'} = ones(length(df2.Lng), 1);
+assert(length(df2.Lng) > 2);
+end
+
 function test_struct_constructor(testCase)
 s = [];
 s.test1 = 0;
@@ -50,8 +65,7 @@ check_props(df);
 end
 
 function test_csv_constructor(testCase)
-df = DataFrame.fromCSV(which('ugly_data.csv'));
-check_props(df);
+check_props(testCase.TestData.csv_df);
 end
 
 function check_props(df)
@@ -73,6 +87,7 @@ function setupOnce(testCase)  % do not change function name
 % set a new path, for example
 testCase.TestData.df = DataFrame(0, 0, 0, 0, 'VariableNames', ...
     {'test1', 'test2','test3','test4',});
+testCase.TestData.csv_df = DataFrame.fromCSV(which('ugly_data.csv'));
 end
 
 function teardownOnce(testCase)   % do not change function name

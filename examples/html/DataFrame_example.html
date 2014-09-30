@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>DataFrame_example</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-09-01"><meta name="DC.source" content="DataFrame_example.m"><style type="text/css">
+      --><title>DataFrame_example</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-09-30"><meta name="DC.source" content="DataFrame_example.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>DataFrame_example</h1><!--introduction--><p>Walkthrough using DataFrame</p><p>Author:       nick roth email:        <a href="mailto:nick.roth@nou-systems.com">nick.roth@nou-systems.com</a> Matlab ver.:  8.3.0.532 (R2014a) Date:         01-Sep-2014</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create a DataFrame from scratch</a></li><li><a href="#2">View the DataFrame the Same as a Table</a></li><li><a href="#3">Access Table Columns Through DataFrame</a></li><li><a href="#4">Access Methods Attached to the DataFrame Object</a></li><li><a href="#5">Extend DataFrame However We'd Like</a></li><li><a href="#6">Or, if You Still Want to See the Object</a></li><li><a href="#7">We Can Try the Same Thing on a Standard Table</a></li><li><a href="#8">Initial Start at Providing Complete Wrapper for Table</a></li></ul></div><h2>Create a DataFrame from scratch<a name="1"></a></h2><p>The DataFrame is created in the same exact way as a table. The constructor just passes the arguements to the table constructor, then stores the table as as private property. We can still retrieve table properties</p><pre class="codeinput">df = DataFrame(0, 0, 0, 0, <span class="keyword">...</span>
+  </style></head><body><div class="content"><h1>DataFrame_example</h1><!--introduction--><p>Walkthrough using DataFrame</p><p>Author:       nick roth email:        <a href="mailto:nick.roth@nou-systems.com">nick.roth@nou-systems.com</a> Matlab ver.:  8.3.0.532 (R2014a) Date:         01-Sep-2014</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create a DataFrame from scratch</a></li><li><a href="#2">View the DataFrame the Same as a Table</a></li><li><a href="#3">Access Table Columns Through DataFrame</a></li><li><a href="#4">Access Methods Attached to the DataFrame Object</a></li><li><a href="#5">Extend DataFrame However We'd Like</a></li><li><a href="#6">Or, if You Still Want to See the Object</a></li><li><a href="#7">We Can Try the Same Thing on a Standard Table</a></li><li><a href="#8">Dynamically add columns to the DataFrame</a></li><li><a href="#9">Easily remove columns from the DataFrame</a></li><li><a href="#10">Initial Start at Providing Complete Wrapper for Table</a></li></ul></div><h2>Create a DataFrame from scratch<a name="1"></a></h2><p>The DataFrame is created in the same exact way as a table. The constructor just passes the arguements to the table constructor, then stores the table as as private property. We can still retrieve table properties</p><pre class="codeinput">df = DataFrame(0, 0, 0, 0, <span class="keyword">...</span>
     <span class="string">'VariableNames'</span>, {<span class="string">'test1'</span>, <span class="string">'test2'</span>,<span class="string">'test3'</span>,<span class="string">'test4'</span>,});
 df.Properties
 </pre><pre class="codeoutput">
@@ -115,16 +115,16 @@ ans =
 
 </pre><h2>Extend DataFrame However We'd Like<a name="5"></a></h2><p>Matlab blocks you from extending the table data structure, but we can get around that with this approach</p><pre class="codeinput">df = DataFrame.fromCSV(which(<span class="string">'ugly_data.csv'</span>));
 df.head();
-</pre><pre class="codeoutput">         Name          Zeros     Lat       Lng       Normal      Negative
-    _______________    _____    ______    ______    _________    ________
+</pre><pre class="codeoutput">         Name          Zeros      Lat         Lng         Normal       Negative
+    _______________    _____    ________    ________    ___________    ________
 
-    'Connor Hayden'    0        -2.582    71.067    0.0060495    3       
+    'Connor Hayden'    0        -2.58201    71.06714    0.006049531    3       
 
 
                      GUID                           Date           Timestamp 
     ______________________________________    _________________    __________
 
-    '7B79A197-E85F-2BFF-F37E-727DEDAC9803'    'April 27th 2015'    1.3944e+09
+    '7B79A197-E85F-2BFF-F37E-727DEDAC9803'    'April 27th 2015'    1394414933
 
 
     AlphaNumeric 
@@ -136,27 +136,27 @@ df.head();
 </pre><pre class="codeoutput">  DataFrame with properties:
 
       Properties: [1x1 struct]
-             Lat: []
           Normal: []
+             Lng: []
+        Negative: []
            Zeros: []
             Name: []
-             Lng: []
     AlphaNumeric: []
-            GUID: []
-       Timestamp: []
             Date: []
-        Negative: []
+            GUID: []
+             Lat: []
+       Timestamp: []
 
-         Name          Zeros     Lat       Lng       Normal      Negative
-    _______________    _____    ______    ______    _________    ________
+         Name          Zeros      Lat         Lng         Normal       Negative
+    _______________    _____    ________    ________    ___________    ________
 
-    'Connor Hayden'    0        -2.582    71.067    0.0060495    3       
+    'Connor Hayden'    0        -2.58201    71.06714    0.006049531    3       
 
 
                      GUID                           Date           Timestamp 
     ______________________________________    _________________    __________
 
-    '7B79A197-E85F-2BFF-F37E-727DEDAC9803'    'April 27th 2015'    1.3944e+09
+    '7B79A197-E85F-2BFF-F37E-727DEDAC9803'    'April 27th 2015'    1394414933
 
 
     AlphaNumeric 
@@ -179,23 +179,23 @@ Variables:
     Lat: 20400x1 double
         Values:
 
-            min       -89.424
-            median    -1.0206
-            max        88.893
+            min       -89.42406
+            median     -1.02059
+            max        88.89347
 
     Lng: 20400x1 double
         Values:
 
-            min       -177.19
-            median    0.93481
-            max        176.44
+            min       -177.18611
+            median      0.934815
+            max         176.4439
 
     Normal: 20400x1 double
         Values:
 
-            min        -0.54325
-            median    -0.017612
-            max         0.57328
+            min       -0.543252895
+            median    -0.017611593
+            max        0.573277103
 
     Negative: 20400x1 double
         Values:
@@ -211,9 +211,9 @@ Variables:
     Timestamp: 20400x1 double
         Values:
 
-            min        1.379e+09 
-            median    1.4036e+09 
-            max       1.4395e+09 
+            min         1378967930
+            median    1403645750.5
+            max         1439505058
 
     AlphaNumeric: 20400x1 cell string
 
@@ -225,18 +225,46 @@ Variables:
     disp(err.message)
 <span class="keyword">end</span>
 </pre><pre class="codeoutput">Unrecognized variable name 'head'.
-</pre><h2>Initial Start at Providing Complete Wrapper for Table<a name="8"></a></h2><pre class="codeinput">methods(<span class="string">'DataFrame'</span>)
+</pre><h2>Dynamically add columns to the DataFrame<a name="8"></a></h2><pre class="codeinput">df.Lat2 = df.Lat;
+df.Lat3 = df.Lat;
+df.columns()
+</pre><pre class="codeoutput">
+ans = 
+
+  Columns 1 through 7
+
+    'Name'    'Zeros'    'Lat'    'Lng'    'Normal'    'Negative'    'GUID'
+
+  Columns 8 through 12
+
+    'Date'    'Timestamp'    'AlphaNumeric'    'Lat2'    'Lat3'
+
+</pre><h2>Easily remove columns from the DataFrame<a name="9"></a></h2><pre class="codeinput">df.remove_cols({<span class="string">'Lat2'</span>, <span class="string">'Lat3'</span>});
+df.columns()
+</pre><pre class="codeoutput">
+ans = 
+
+  Columns 1 through 7
+
+    'Name'    'Zeros'    'Lat'    'Lng'    'Normal'    'Negative'    'GUID'
+
+  Columns 8 through 10
+
+    'Date'    'Timestamp'    'AlphaNumeric'
+
+</pre><h2>Initial Start at Providing Complete Wrapper for Table<a name="10"></a></h2><pre class="codeinput">methods(<span class="string">'DataFrame'</span>)
 </pre><pre class="codeoutput">
 Methods for class DataFrame:
 
-DataFrame   disp        height      toArray     width       
-addprop     getTable    subsref     toCell      writetable  
-details     head        summary     toStruct    
+DataFrame    disp         is_column    subsref      toStruct     
+addprop      getTable     numel        summary      width        
+columns      head         remove_cols  toArray      writetable   
+details      height       subsasgn     toCell       
 
 Static methods:
 
-fromArray   fromCell    intersect   rowfun      
-fromCSV     fromStruct  ismember    varfun      
+fromArray    fromCell     intersect    rowfun       
+fromCSV      fromStruct   ismember     varfun       
 
 Call "methods('handle')" for methods of DataFrame inherited from handle.
 
@@ -296,6 +324,15 @@ try
 catch err
     disp(err.message)
 end
+
+%% Dynamically add columns to the DataFrame
+df.Lat2 = df.Lat;
+df.Lat3 = df.Lat;
+df.columns()
+
+%% Easily remove columns from the DataFrame
+df.remove_cols({'Lat2', 'Lat3'});
+df.columns()
 
 %% Initial Start at Providing Complete Wrapper for Table
 methods('DataFrame')

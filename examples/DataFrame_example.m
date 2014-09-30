@@ -53,5 +53,14 @@ catch err
     disp(err.message)
 end
 
+%% Dynamically add columns to the DataFrame
+df.Lat2 = df.Lat;
+df.Lat3 = df.Lat;
+df.columns()
+
+%% Easily remove columns from the DataFrame
+df.remove_cols({'Lat2', 'Lat3'});
+df.columns()
+
 %% Initial Start at Providing Complete Wrapper for Table
 methods('DataFrame')

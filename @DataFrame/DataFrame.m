@@ -40,6 +40,7 @@ classdef DataFrame < dynamicprops
         % DATAFRAME Constructor
         function self = DataFrame(varargin)
 
+            % Construct dataframe from table
             if nargin == 1
                 tbl = varargin{1};
                 if istable(tbl)
@@ -62,15 +63,48 @@ classdef DataFrame < dynamicprops
         end
         
         function out = getTable(self)
+            %GETTABLE - returns a Matlab table from DataFrame object
             
             out = self.data;
         end
         
         function details(self)
+            %DETAILS - prints to console a detailed summary of the data
+            %within the DataFrame
             
             builtin('disp', self);
             self.head();
             self.summary();
+        end
+        
+        function bool = is_column(self, col)
+            %IS_COLUMN - returns boolean value true if the given string is
+            %a valid column
+            
+            bool = false;
+            cols = self.data.Properties.VariableNames;
+            if isempty(setdiff(col, cols))
+                bool = true;
+            end
+        end
+        
+        function remove_cols(self, cols)
+            %REMOVE_COLS - removes columns from the DataFrame, given a
+            %single string, or a cell array of strings
+            
+            cols = cellstr(cols);
+            for i = 1:length(cols)
+                mp = findprop(self, cols{i});
+                delete(mp);
+            end
+            self.data(:, cols) = [];
+        end
+        
+        function out = columns(self)
+            %COLUMNS - provides an alternative way to access the column
+            %names of the DataFrame
+            
+            out = self.data.Properties.VariableNames;
         end
     end
     
@@ -164,6 +198,28 @@ classdef DataFrame < dynamicprops
     %% Overrides
     methods
         
+        function self = subsasgn(self, S, B)
+            %SUBSASGN - overrides the builtin method so that we can
+            %dynamically attach properties to the object when we are adding
+            %new data to the DataFrame
+            
+            % If this column doesn't exist, add it to the object
+            valid_prop = setdiff(S.subs, {':'});
+            if length(valid_prop) == 1 && ~self.is_column(valid_prop)
+                self.addprop(valid_prop{:});
+            end
+            
+            % Call builtin on the underlying Matlab table
+            switch S.type
+                case '.'
+                    self.data = builtin('subsasgn', self.data, S, B);
+                case '()'
+                    self.data = builtin('subsasgn', self.data, S, B);
+                case '{}'
+                    self.data = builtin('subsasgn', self.data, S, B);
+            end
+        end
+        
         function [varargout] = subsref(self, S)
             %SUBSREF - overrides the subscript reference method, which
             %provides the way for us to wrap the built in table type
@@ -179,8 +235,13 @@ classdef DataFrame < dynamicprops
             switch call_type
                 case '.'
                     if ismethod(self, var)
-                        if strcmp(var, 'head') || strcmp(var, 'details')
-                            
+                        
+                        % check for method outputs
+                        mc = metaclass(self);
+                        ml = mc.MethodList;
+                        meth = findobj(ml, 'Name', var);
+                        
+                        if isempty(meth.OutputNames)
                             % method calls without outputs
                             builtin('subsref', self, S);
                         else
@@ -188,7 +249,7 @@ classdef DataFrame < dynamicprops
                         end
                     else
                         %Pass through properties call
-                        varargout{1} = builtin('subsref', self, S);
+                        varargout{1} = builtin('subsref', self.data, S);
                     end
                 case '()'
                     % Process the '()' subscripting directly on table
